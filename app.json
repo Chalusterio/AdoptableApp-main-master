@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "Adoptable",
+    "slug": "AdoptableApp",
+    "scheme": "com.adoptable.app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/adoptable-icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./src/assets/adoptable-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "newArchEnabled": false,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/logo-adoptable.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.missel012.AdoptableApp",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAixxEq55VkRIFNcYZPP-Stzf0_fVxLWzQ"
+        }
+      }
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-router",
+      "expo-build-properties",
+      "expo-secure-store"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "10a7f584-175c-455b-a7b2-6576982d5a7a"
+      }
+    }
+  }
+}
