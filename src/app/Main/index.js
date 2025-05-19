@@ -366,7 +366,7 @@ const Feed = () => {
       {/* Chat Header */}
       <View style={styles.chatHeader}>
         <View style={styles.chatHeaderLeft}>
-          <Text style={styles.botTitle}>Support Bot</Text>
+          <Text style={styles.botTitle}>AdoptaBot</Text>
           <View style={styles.botStatusRow}>
             <View style={styles.statusDot} />
             <Text style={styles.botStatus}>Online</Text>
@@ -384,26 +384,41 @@ const Feed = () => {
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={{ paddingBottom: 10 }}
         style={{ flex: 1 }}
-        renderItem={({ item }) => (
-          <View
-            style={[
-              styles.messageBubble,
-              item.sender === "user"
-                ? styles.userBubble
-                : styles.botBubble,
-            ]}
-          >
-            <Text
-              style={[
-                styles.messageText,
-                item.sender === "user"
-                  ? { color: "#fff" }
-                  : { color: "#333" },
-              ]}
-            >
-              {item.text}
-            </Text>
-          </View>
+renderItem={({ item }) => (
+  <View
+    style={[
+      styles.messageRow,
+      item.sender === "user"
+        ? { justifyContent: "flex-end" }
+        : { justifyContent: "flex-start" },
+    ]}
+  >
+    {item.sender === "bot" && (
+      <View style={styles.botIconBubble}>
+        <Text style={styles.botIcon}>🤖</Text>
+      </View>
+    )}
+    <View
+      style={[
+        styles.messageBubble,
+        item.sender === "user"
+          ? styles.userBubble
+          : styles.botBubble,
+      ]}
+    >
+      <Text
+        style={[
+          styles.messageText,
+          item.sender === "user"
+            ? { color: "#fff" }
+            : { color: "#333" },
+        ]}
+      >
+        {item.text}
+      </Text>
+    </View>
+  </View>
+
         )}
         onContentSizeChange={() =>
           flatListRef.current?.scrollToEnd({ animated: true })
@@ -767,6 +782,26 @@ fixedInputBar: {
     fontSize: 18,
     color: "#fff",
   },
+  messageRow: {
+  flexDirection: "row",
+  alignItems: "flex-end",
+  marginVertical: 4,
+  paddingHorizontal: 8,
+},
+
+botIconBubble: {
+  width: 32,
+  height: 32,
+  borderRadius: 16,
+  backgroundColor: "#E0EDFF",
+  alignItems: "center",
+  justifyContent: "center",
+  marginRight: 6,
+},
+
+botIcon: {
+  fontSize: 18,
+},
 });
 
 export default Feed;
