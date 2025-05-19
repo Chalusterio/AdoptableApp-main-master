@@ -34,8 +34,6 @@ import { db, auth } from "../config/firebase";
 import { groqConfig } from "../config/groqconfig";
 import { adoptableInfo } from "../config/adoptableData";
 
-
-
 const Feed = () => {
   const params = useLocalSearchParams();
   const { pets } = usePets();
@@ -55,18 +53,18 @@ const Feed = () => {
   const flatListRef = useRef(null);
   const sendMessage = async () => {
     if (!currentMessage.trim()) return;
-  
+
     const userMessage = { sender: "user", text: currentMessage };
     setChatMessages((prev) => [...prev, userMessage]);
     setCurrentMessage("");
     setIsBotTyping(true);
-  
+
     try {
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${groqConfig.apiKey}`,
       };
-  
+
       const requestBody = {
         model: "llama3-70b-8192",
         messages: [
@@ -80,26 +78,28 @@ const Feed = () => {
           },
         ],
       };
-      
-      
-  
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers,
-        body: JSON.stringify(requestBody),
-      });
-  
+
+      const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify(requestBody),
+        }
+      );
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.error?.message || "Groq API error");
       }
-  
+
       const botResponse = {
         sender: "bot",
-        text: data?.choices?.[0]?.message?.content?.trim() || "Sorry, no response.",
+        text:
+          data?.choices?.[0]?.message?.content?.trim() || "Sorry, no response.",
       };
-  
+
       setChatMessages((prev) => [...prev, botResponse]);
     } catch (err) {
       console.error("Groq error:", err);
@@ -111,7 +111,7 @@ const Feed = () => {
       setIsBotTyping(false);
     }
   };
-  
+
   const selectedImages = params.selectedImages
     ? JSON.parse(params.selectedImages)
     : [];
@@ -356,107 +356,109 @@ const Feed = () => {
         )}
       </SafeAreaView>
 
-{isChatVisible && (
-  <KeyboardAvoidingView
-    behavior={Platform.OS === "ios" ? "padding" : "height"}
-    keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 20}
-    style={styles.chatContainer}
-  >
-    <View style={{ flex: 1 }}>
-      {/* Chat Header */}
-      <View style={styles.chatHeader}>
-        <View style={styles.chatHeaderLeft}>
-          <Text style={styles.botTitle}>AdoptaBot</Text>
-          <View style={styles.botStatusRow}>
-            <View style={styles.statusDot} />
-            <Text style={styles.botStatus}>Online</Text>
+      {isChatVisible && (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 20}
+          style={styles.chatContainer}
+        >
+          <View style={{ flex: 1 }}>
+            {/* Chat Header */}
+            <View style={styles.chatHeader}>
+              <View style={styles.chatHeaderLeft}>
+                <Text style={styles.botTitle}>AdoptaBot</Text>
+                <View style={styles.botStatusRow}>
+                  <View style={styles.statusDot} />
+                  <Text style={styles.botStatus}>Online</Text>
+                </View>
+              </View>
+              <TouchableOpacity onPress={() => setIsChatVisible(false)}>
+                <Text style={styles.closeIcon}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Chat Messages */}
+            <FlatList
+              ref={flatListRef}
+              data={chatMessages}
+              keyExtractor={(item, index) => index.toString()}
+              contentContainerStyle={{ paddingBottom: 10 }}
+              style={{ flex: 1 }}
+              renderItem={({ item }) => (
+                <View
+                  style={[
+                    styles.messageRow,
+                    item.sender === "user"
+                      ? { justifyContent: "flex-end" }
+                      : { justifyContent: "flex-start" },
+                  ]}
+                >
+                  {item.sender === "bot" && (
+                    <View style={styles.botIconBubble}>
+                      <Text style={styles.botIcon}>🐾</Text>
+                    </View>
+                  )}
+                  <View
+                    style={[
+                      styles.messageBubble,
+                      item.sender === "user"
+                        ? styles.userBubble
+                        : styles.botBubble,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.messageText,
+                        item.sender === "user"
+                          ? { color: "#fff" }
+                          : { color: "#333" },
+                      ]}
+                    >
+                      {item.text}
+                    </Text>
+                  </View>
+                </View>
+              )}
+              onContentSizeChange={() =>
+                flatListRef.current?.scrollToEnd({ animated: true })
+              }
+              onLayout={() =>
+                flatListRef.current?.scrollToEnd({ animated: true })
+              }
+            />
+
+            {/* Typing */}
+            {isBotTyping && (
+              <View style={[styles.messageBubble, styles.botBubble]}>
+                <View style={styles.typingContainer}>
+                  <View style={styles.dot} />
+                  <View style={styles.dot} />
+                  <View style={styles.dot} />
+                </View>
+              </View>
+            )}
+
+            {/* Input Field */}
+            <View style={styles.fixedInputBar}>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Type a message..."
+                  value={currentMessage}
+                  onChangeText={setCurrentMessage}
+                  onSubmitEditing={sendMessage}
+                />
+                <TouchableOpacity
+                  style={styles.sendButton}
+                  onPress={sendMessage}
+                >
+                  <Text style={{ color: "#fff" }}>Send</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
-        <TouchableOpacity onPress={() => setIsChatVisible(false)}>
-          <Text style={styles.closeIcon}>✕</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Chat Messages */}
-      <FlatList
-        ref={flatListRef}
-        data={chatMessages}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ paddingBottom: 10 }}
-        style={{ flex: 1 }}
-renderItem={({ item }) => (
-  <View
-    style={[
-      styles.messageRow,
-      item.sender === "user"
-        ? { justifyContent: "flex-end" }
-        : { justifyContent: "flex-start" },
-    ]}
-  >
-    {item.sender === "bot" && (
-      <View style={styles.botIconBubble}>
-        <Text style={styles.botIcon}>🤖</Text>
-      </View>
-    )}
-    <View
-      style={[
-        styles.messageBubble,
-        item.sender === "user"
-          ? styles.userBubble
-          : styles.botBubble,
-      ]}
-    >
-      <Text
-        style={[
-          styles.messageText,
-          item.sender === "user"
-            ? { color: "#fff" }
-            : { color: "#333" },
-        ]}
-      >
-        {item.text}
-      </Text>
-    </View>
-  </View>
-
-        )}
-        onContentSizeChange={() =>
-          flatListRef.current?.scrollToEnd({ animated: true })
-        }
-        onLayout={() =>
-          flatListRef.current?.scrollToEnd({ animated: true })
-        }
-      />
-
-      {/* Typing */}
-      {isBotTyping && (
-        <View style={[styles.messageBubble, styles.botBubble]}>
-          <View style={styles.typingContainer}>
-            <View style={styles.dot} />
-            <View style={styles.dot} />
-            <View style={styles.dot} />
-          </View>
-        </View>
+        </KeyboardAvoidingView>
       )}
-
-      {/* Input Field */}
-      <View style={styles.fixedInputBar}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Type a message..."
-            value={currentMessage}
-            onChangeText={setCurrentMessage}
-            onSubmitEditing={sendMessage}
-          />
-          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-            <Text style={{ color: "#fff" }}>Send</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  </KeyboardAvoidingView>
-)}
 
       <TouchableOpacity
         style={styles.chatbotButton}
@@ -590,151 +592,151 @@ const styles = StyleSheet.create({
     elevation: 8,
     zIndex: 999,
   },
-chatContainer: {
-  position: "absolute",
-  bottom: 100,
-  right: 16,
-  width: "90%",
-  height: "70%",
-  backgroundColor: "#F9FBFF",
-  borderRadius: 20,
-  paddingTop: 60,
-  paddingHorizontal: 16,
-  shadowColor: "#000",
-  shadowOpacity: 0.15,
-  shadowOffset: { width: 0, height: 6 },
-  shadowRadius: 12,
-  elevation: 12,
-  zIndex: 998,
-  overflow: "hidden",
-},
+  chatContainer: {
+    position: "absolute",
+    bottom: 100,
+    right: 16,
+    width: "90%",
+    height: "70%",
+    backgroundColor: "#F9FBFF",
+    borderRadius: 20,
+    paddingTop: 60,
+    paddingHorizontal: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 12,
+    elevation: 12,
+    zIndex: 998,
+    overflow: "hidden",
+  },
 
-chatHeader: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  backgroundColor: "#377DFF",
-  paddingHorizontal: 18,
-  paddingVertical: 14,
-  borderTopLeftRadius: 20,
-  borderTopRightRadius: 20,
-  marginTop: -60,
-  marginHorizontal: -16,
-},
+  chatHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#377DFF",
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginTop: -60,
+    marginHorizontal: -16,
+  },
 
-botTitle: {
-  fontSize: 18,
-  fontWeight: "700",
-  color: "#FFFFFF",
-},
+  botTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
 
-botStatusRow: {
-  flexDirection: "row",
-  alignItems: "center",
-  marginTop: 2,
-},
+  botStatusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 2,
+  },
 
-statusDot: {
-  width: 8,
-  height: 8,
-  borderRadius: 4,
-  backgroundColor: "#4CE69E",
-  marginRight: 6,
-},
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#4CE69E",
+    marginRight: 6,
+  },
 
-botStatus: {
-  fontSize: 12,
-  color: "#E4F6F0",
-},
+  botStatus: {
+    fontSize: 12,
+    color: "#E4F6F0",
+  },
 
-closeIcon: {
-  fontSize: 22,
-  fontWeight: "bold",
-  color: "#fff",
-},
+  closeIcon: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#fff",
+  },
 
-messageBubble: {
-  padding: 14,
-  borderRadius: 18,
-  marginVertical: 6,
-  marginHorizontal: 8,
-  maxWidth: "80%",
-  shadowColor: "#000",
-  shadowOpacity: 0.05,
-  shadowRadius: 4,
-  shadowOffset: { width: 0, height: 2 },
-},
+  messageBubble: {
+    padding: 14,
+    borderRadius: 18,
+    marginVertical: 6,
+    marginHorizontal: 8,
+    maxWidth: "80%",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
 
-userBubble: {
-  backgroundColor: "#377DFF",
-  alignSelf: "flex-end",
-  borderBottomRightRadius: 4,
-},
+  userBubble: {
+    backgroundColor: "#377DFF",
+    alignSelf: "flex-end",
+    borderBottomRightRadius: 4,
+  },
 
-botBubble: {
-  backgroundColor: "#E6F0FF",
-  alignSelf: "flex-start",
-  borderBottomLeftRadius: 4,
-},
+  botBubble: {
+    backgroundColor: "#E6F0FF",
+    alignSelf: "flex-start",
+    borderBottomLeftRadius: 4,
+  },
 
-messageText: {
-  fontSize: 15,
-  fontFamily: "Lato",
-},
+  messageText: {
+    fontSize: 15,
+    fontFamily: "Lato",
+  },
 
-inputContainer: {
-  flexDirection: "row",
-  alignItems: "center",
-  backgroundColor: "#fff",
-  borderRadius: 30,
-  paddingHorizontal: 12,
-  paddingVertical: 6,
-  marginBottom: 8,
-  shadowColor: "#000",
-  shadowOpacity: 0.08,
-  shadowRadius: 4,
-  shadowOffset: { width: 0, height: 2 },
-},
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 30,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
 
-input: {
-  flex: 1,
-  height: 42,
-  fontSize: 14,
-  fontFamily: "Lato",
-  paddingHorizontal: 12,
-},
+  input: {
+    flex: 1,
+    height: 42,
+    fontSize: 14,
+    fontFamily: "Lato",
+    paddingHorizontal: 12,
+  },
 
-sendButton: {
-  backgroundColor: "#377DFF",
-  paddingVertical: 8,
-  paddingHorizontal: 16,
-  borderRadius: 20,
-},
+  sendButton: {
+    backgroundColor: "#377DFF",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+  },
 
-typingContainer: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "flex-start",
-  height: 24,
-  paddingLeft: 16,
-},
+  typingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    height: 24,
+    paddingLeft: 16,
+  },
 
-dot: {
-  width: 6,
-  height: 6,
-  borderRadius: 3,
-  backgroundColor: "#AAA",
-  marginHorizontal: 3,
-},
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#AAA",
+    marginHorizontal: 3,
+  },
 
-fixedInputBar: {
-  paddingHorizontal: 10,
-  paddingBottom: Platform.OS === "ios" ? 20 : 12,
-  paddingTop: 6,
-  backgroundColor: "#F9FBFF",
-  borderTopWidth: 1,
-  borderTopColor: "#EEE",
-},
+  fixedInputBar: {
+    paddingHorizontal: 10,
+    paddingBottom: Platform.OS === "ios" ? 20 : 12,
+    paddingTop: 6,
+    backgroundColor: "#F9FBFF",
+    borderTopWidth: 1,
+    borderTopColor: "#EEE",
+  },
   chatHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -783,25 +785,25 @@ fixedInputBar: {
     color: "#fff",
   },
   messageRow: {
-  flexDirection: "row",
-  alignItems: "flex-end",
-  marginVertical: 4,
-  paddingHorizontal: 8,
-},
+    flexDirection: "row",
+    alignItems: "flex-end",
+    marginVertical: 4,
+    paddingHorizontal: 8,
+  },
 
-botIconBubble: {
-  width: 32,
-  height: 32,
-  borderRadius: 16,
-  backgroundColor: "#E0EDFF",
-  alignItems: "center",
-  justifyContent: "center",
-  marginRight: 6,
-},
+  botIconBubble: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#E0EDFF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 6,
+  },
 
-botIcon: {
-  fontSize: 18,
-},
+  botIcon: {
+    fontSize: 18,
+  },
 });
 
 export default Feed;
