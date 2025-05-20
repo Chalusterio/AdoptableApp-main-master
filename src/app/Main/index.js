@@ -356,9 +356,7 @@ const Feed = () => {
         )}
       </SafeAreaView>
 
-      {isChatVisible && (
-  <View style={styles.overlay} pointerEvents="auto" />
-)}
+      {isChatVisible && <View style={styles.overlay} pointerEvents="auto" />}
       {isChatVisible && (
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -387,41 +385,41 @@ const Feed = () => {
               keyExtractor={(item, index) => index.toString()}
               contentContainerStyle={{ paddingBottom: 10 }}
               style={{ flex: 1 }}
-renderItem={({ item }) => (
-  <View
-    style={[
-      styles.messageRow,
-      item.sender === "user"
-        ? { justifyContent: "flex-end" }
-        : { justifyContent: "flex-start" },
-    ]}
-  >
-{item.sender === "bot" && (
-  <View style={styles.botAvatarIcon}>
-     <FontAwesome name="paw" size={16} color="#EF5350" />
-  </View>
-)}
-    <View
-      style={[
-        styles.messageBubble,
-        item.sender === "user"
-          ? styles.userBubble
-          : styles.botBubble,
-      ]}
-    >
-      <Text
-        style={[
-          styles.messageText,
-          item.sender === "user"
-            ? { color: "#fff" }
-            : { color: "#333" },
-        ]}
-      >
-        {item.text}
-      </Text>
-    </View>
-  </View>
-)}
+              renderItem={({ item }) => (
+                <View
+                  style={[
+                    styles.messageRow,
+                    item.sender === "user"
+                      ? { justifyContent: "flex-end" }
+                      : { justifyContent: "flex-start" },
+                  ]}
+                >
+                  {item.sender === "bot" && (
+                    <View style={styles.botAvatarIcon}>
+                      <FontAwesome name="paw" size={16} color="#EF5350" />
+                    </View>
+                  )}
+                  <View
+                    style={[
+                      styles.messageBubble,
+                      item.sender === "user"
+                        ? styles.userBubble
+                        : styles.botBubble,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.messageText,
+                        item.sender === "user"
+                          ? { color: "#fff" }
+                          : { color: "#333" },
+                      ]}
+                    >
+                      {item.text}
+                    </Text>
+                  </View>
+                </View>
+              )}
               onContentSizeChange={() =>
                 flatListRef.current?.scrollToEnd({ animated: true })
               }
@@ -787,33 +785,33 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#fff",
   },
-messageRow: {
-  flexDirection: "row",
-  alignItems: "flex-end",
-  marginVertical: 4,
-  paddingHorizontal: 8,
-},
+  messageRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    marginVertical: 4,
+    paddingHorizontal: 8,
+  },
 
-botAvatarIcon: {
-  width: 30,
-  height: 30,
-  borderRadius: 15,
-  borderWidth: 2,
-  borderColor: "#EF5350",
-  backgroundColor: "#fff",
-  justifyContent: "center",
-  alignItems: "center",
-  marginRight: 8,
-},
-overlay: {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "transparent", 
-  zIndex: 997, 
-},
+  botAvatarIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: "#EF5350",
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 8,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "transparent",
+    zIndex: 997,
+  },
 });
 
 export default Feed;
