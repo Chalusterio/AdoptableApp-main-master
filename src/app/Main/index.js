@@ -811,8 +811,8 @@ overlay: {
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: "transparent", // or use 'rgba(0,0,0,0.2)' if gusto nimo i-dim
-  zIndex: 997, // lower than chatbot (998) but higher than everything else
+  backgroundColor: "transparent", 
+  zIndex: 997, 
 },
 });
 
