@@ -357,6 +357,9 @@ const Feed = () => {
       </SafeAreaView>
 
       {isChatVisible && (
+  <View style={styles.overlay} pointerEvents="auto" />
+)}
+      {isChatVisible && (
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 20}
@@ -802,7 +805,15 @@ botAvatarIcon: {
   alignItems: "center",
   marginRight: 8,
 },
-
+overlay: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "transparent", // or use 'rgba(0,0,0,0.2)' if gusto nimo i-dim
+  zIndex: 997, // lower than chatbot (998) but higher than everything else
+},
 });
 
 export default Feed;
